@@ -16,8 +16,8 @@ texture = ExtResource("2_l0yun")
 
 [node name="Label" type="Label" parent="."]
 z_index = 1
-offset_left = 67.0
-offset_top = 161.0
-offset_right = 320.0
-offset_bottom = 264.0
+offset_left = 96.0
+offset_top = 163.0
+offset_right = 349.0
+offset_bottom = 266.0
 script = ExtResource("3_x7gh0")
