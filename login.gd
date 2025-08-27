@@ -1,109 +1,97 @@
-extends Control
-@export var tab: Node
+extends Node2D
+class_name StepTracker
 
-const DB_PATH := "user://users.json"
-@onready var step_counter: PackedScene = preload("res://Step_Counter.tscn")
-var is_login_mode := false   # clearer than "create"
+var total_steps: int = 0
+var current_steps: int = 0
+var step_count: int = 0
+var last_accel := Vector3.ZERO
+var step_threshold := 11
+var cooldown := 0.3
+var step_timer := 0.0
+var step_goal: int = 0
+var popup_instance: Node2D = null
+var target_steps : int = 0
 
-# initializes the state of the elements
-func _ready():
-	$Alert.visible = false
-	$Password.secret = true
-	$Back.visible = false
+@onready var step_label: Label = $Label
+@onready var PopupScene: PackedScene = preload("res://Popup.tscn")
 
-	# Create an empty DB if it doesn't exist
-	if not FileAccess.file_exists(DB_PATH):
-		var file = FileAccess.open(DB_PATH, FileAccess.WRITE)
-		file.store_string("{}")
-		file.close()
+func _ready() -> void:
+	_setup_rounded_design()
+	_generate_new_goal()
 
-# Handles signup/login button
-func _on_button_button_down() -> void:
-	var username_input = $Username.text.strip_edges()
-	var password_input = $Password.text.strip_edges()
-
-	if username_input == "" or password_input == "":
-		$Alert.text = "Fields cannot be empty!"
-		$Alert.visible = true
-		return
-
-	var db = load_database()
-
-	if not is_login_mode:
-		# ---------- SIGN UP ----------
-		if db.has(username_input):
-			$Alert.text = "Username already exists!"
-			$Alert.visible = true
-			return
-
-		db[username_input] = password_input.sha256_text()
-		save_database(db)
-
-		is_login_mode = true
-		$Alert.text = "Account Creation Successful!"
-		$Alert.visible = true
-		$Label.text = "Login"
-		$Button.text = "Login"
-		$Username.text = ""
-		$Password.text = ""
-		$Back.visible = true
-		print("Account created - now log in")
-		
-
-	else:
-		# ---------- LOGIN ----------
-		if db.has(username_input):
-			var stored_hash = db[username_input]
-			var entered_hash = password_input.sha256_text()
-
-			if stored_hash == entered_hash:
-				print("Login Success")
-				# load the next scene
-				get_tree().change_scene_to_packed(step_counter)
-			else:
-				$Alert.text = "Wrong password!"
-				$Alert.visible = true
-				print("Login Unsuccessful - Wrong password")
-		else:
-			$Alert.text = "Account does not exist!"
-			$Alert.visible = true
-			print("Login Unsuccessful - Account does not exist")
-
-# Directs you back to the sign up page
-func _on_back_pressed():
-	if is_login_mode:
-		is_login_mode = false
-		$Login.visible = true
-		$Label.text = "Sign Up"
-		$Button.text = "Sign Up"
-		$Username.text = ""
-		$Password.text = ""
-		$Back.visible = false
-		$Alert.visible = false
-		print("Returned to sign-up mode.")
-
-# Reveals or hides password text
-func _on_reveal_pressed():
-	$Password.secret = not $Password.secret
+func _setup_rounded_design() -> void:
+	# Create a container for the rounded background
+	var container = Control.new()
+	container.name = "RoundedContainer"
+	add_child(container)
+	move_child(container, 0)  # Move to bottom so label is on top
 	
-# Switches to login mode
-func _on_login_pressed():
-	$Back.visible = true
-	$Login.visible = false
-	$Button.text = "Login"
-	$Label.text = "Login"
-	is_login_mode = true 
+	# Set container size to 30% of screen
+	var screen_size = get_viewport().get_visible_rect().size
+	container.custom_minimum_size = screen_size * 0.3
+	container.size = screen_size * 0.3
+	
+	# Position container (centered by default, adjust as needed)
+	container.position = (screen_size - container.size) / 2
+	
+	# Create rounded background using StyleBoxFlat
+	var style_box = StyleBoxFlat.new()
+	style_box.bg_color = Color(0.2, 0.2, 0.2, 0.9)  # Dark semi-transparent background
+	style_box.corner_radius_top_left = 20
+	style_box.corner_radius_top_right = 20
+	style_box.corner_radius_bottom_right = 20
+	style_box.corner_radius_bottom_left = 20
+	style_box.border_width_left = 2
+	style_box.border_width_right = 2
+	style_box.border_width_top = 2
+	style_box.border_width_bottom = 2
+	style_box.border_color = Color(0.8, 0.8, 0.8)
+	
+	# Apply the style to the container
+	container.add_theme_stylebox_override("panel", style_box)
+	
+	# Configure the existing label
+	step_label.add_theme_color_override("font_color", Color.WHITE)
+	step_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	step_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	
+	# Make label fill the container
+	step_label.size = container.size
+	step_label.position = Vector2.ZERO
+	
+	# Reparent the label to the container
+	remove_child(step_label)
+	container.add_child(step_label)
 
-# ---------- Database Handling ----------
-func load_database() -> Dictionary:
-	if not FileAccess.file_exists(DB_PATH):
-		return {}
-	var file = FileAccess.open(DB_PATH, FileAccess.READ)
-	var content = file.get_as_text()
-	file.close()
-	return JSON.parse_string(content) if content != "" else {}
-
-func save_database(db: Dictionary) -> void:
-	var file = FileAccess.open(DB_PATH, FileAccess.WRITE)
-	file.store_string(JSON.stringify(db))
-	file.close()
+func _process(delta: float) -> void:
+	step_timer -= delta
+	var accel: Vector3 = Input.get_accelerometer()
+	var diff: Vector3 = accel - last_accel
+	
+	if diff.length() > step_threshold and step_timer <= 0.0:
+		total_steps += 1
+		current_steps += 1 
+		step_timer = cooldown
+		step_label.text = "Steps: %d\nProgress: %d / %d" % [total_steps, current_steps, step_goal]
+		
+		if current_steps >= step_goal:
+			_show_popup()
+	
+	last_accel = accel
+	
+func _generate_new_goal() -> void:
+	step_goal = randi_range(10, 20)
+	current_steps = 0
+	step_label.text = "Total Steps: %d\nProgress: 0 / %d" % [total_steps, step_goal]
+	
+func _show_popup() -> void:
+	if popup_instance == null:
+		popup_instance = PopupScene.instantiate()
+		get_tree().root.add_child(popup_instance)
+		hide()
+		popup_instance.connect("tree_exited", Callable(self, "_on_popup_closed"))
+	
+func _on_popup_closed() -> void:
+	show()
+	popup_instance = null
+	_generate_new_goal()

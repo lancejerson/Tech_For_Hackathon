@@ -1,5 +1,4 @@
 extends Node2D
-class_name StepTracker
 
 var total_steps: int = 0
 var current_steps: int = 0
