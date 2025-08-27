@@ -1,4 +1,5 @@
 extends Node2D
+class_name StepTracker
 
 var total_steps: int = 0
 var current_steps: int = 0
@@ -34,7 +35,7 @@ func _process(delta: float) -> void:
 	last_accel = accel
 	
 func _generate_new_goal() -> void:
-	step_goal = randi_range(10, 20)
+	step_goal = randi_range(100, 200)
 	current_steps = 0
 	step_label.text = "Total Steps: %d\nProgress: 0 / %d" % [total_steps, step_goal]
 	
@@ -50,4 +51,3 @@ func _on_popup_closed() -> void:
 	show()
 	popup_instance = null
 	_generate_new_goal()
-	
