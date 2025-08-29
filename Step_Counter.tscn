@@ -14,10 +14,17 @@ offset_right = 2286.0
 offset_bottom = 1401.0
 
 [node name="TextureRect" type="TextureRect" parent="."]
-offset_left = -381.0
-offset_top = -677.0
-offset_right = 355.0
-offset_bottom = 631.0
+offset_left = -1172.0
+offset_top = -908.0
+offset_right = 1080.0
+offset_bottom = 1918.0
 texture = ExtResource("2_l0yun")
 
-[node name="Label" type="Label" par
+[node name="Label" type="Label" parent="."]
+z_index = 10
+offset_left = 393.0
+offset_top = 653.0
+offset_right = 1109.0
+offset_bottom = 1437.0
+theme_override_font_sizes/font_size = 10
+script = ExtResource("3_x7gh0")
