@@ -12,7 +12,7 @@ config_version=5
 
 config/name="New IED App"
 config/tags=PackedStringArray("gamelab")
-run/main_scene="uid://b0f6otiqk500o"
+run/main_scene="uid://diufpov6ev5u4"
 config/features=PackedStringArray("4.4", "Mobile")
 config/icon="res://icon.png"
 
