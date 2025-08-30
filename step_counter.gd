@@ -8,7 +8,7 @@ var step_threshold := 11
 var cooldown := 0.3
 var step_timer := 0.0
 var step_goal: int = 0
-var popup_instance: Node2D = null
+var popup_instance: Node = null
 var target_steps : int = 0
 
 @onready var step_label: Label = $Label
