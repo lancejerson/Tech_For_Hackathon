@@ -21,18 +21,29 @@ func _process(delta: float) -> void:
 	step_timer -= delta
 	var accel: Vector3 = Input.get_accelerometer()
 	var diff: Vector3 = accel - last_accel
-	
+
+	# Accelerometer step detection
 	if diff.length() > step_threshold and step_timer <= 0.0:
-		total_steps += 1
-		current_steps += 1 
-		step_timer = cooldown
-		step_label.text = "Steps: %d\nProgress: %d / %d" % [total_steps, current_steps, step_goal]
-		
-		if current_steps >= step_goal:
-			_show_popup()
+		_register_step()
 	
 	last_accel = accel
+
+	# --- TEST CASE: Right-click counts as a step (for laptop/dev testing) ---
+	if Input.is_action_just_pressed("mouse_step"):
+		_register_step()
+
+
+# Helper: Register a step
+func _register_step() -> void:
+	total_steps += 1
+	current_steps += 1
+	step_timer = cooldown
+	step_label.text = "Steps: %d\nProgress: %d / %d" % [total_steps, current_steps, step_goal]
 	
+	if current_steps >= step_goal:
+		_show_popup()
+
+
 func _generate_new_goal() -> void:
 	step_goal = randi_range(100, 200)
 	current_steps = 0
