@@ -2,7 +2,11 @@
 
 importer="texture"
 type="CompressedTexture2D"
+<<<<<<< HEAD
 uid="uid://cw4l25wq0xy8g"
+=======
+uid="uid://cepvbnbfysr7i"
+>>>>>>> 78592d0a26a2e5702d184b38cde7a8c2404748aa
 path="res://.godot/imported/character stab.png-81363d3a75e474a263271bb688b0e1dd.ctex"
 metadata={
 "vram_texture": false
