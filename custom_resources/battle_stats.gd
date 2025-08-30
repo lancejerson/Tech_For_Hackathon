@@ -9,7 +9,6 @@ extends Resource
 
 var accumulated_weight: float = 0.0
 
+
 func roll_gold_reward() -> int:
-	var rng = RandomNumberGenerator.new()
-	rng.randomize()
-	return rng.randi_range(gold_reward_min, gold_reward_max)
+	return RNG.instance.randi_range(gold_reward_min, gold_reward_max)

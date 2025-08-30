@@ -1,1 +1,2 @@
-# Tech_For_Hackathon
+# CODE-RED-TRAILBLAZER
+A steps tracking game with battle system
