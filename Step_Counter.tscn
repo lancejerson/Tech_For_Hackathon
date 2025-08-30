@@ -1,0 +1,30 @@
+[gd_scene load_steps=4 format=3 uid="uid://b0f6otiqk500o"]
+
+[ext_resource type="Script" uid="uid://c5c5x5i8atf8" path="res://step_counter.gd" id="1_5cjam"]
+[ext_resource type="Texture2D" uid="uid://dftdoccnxj4ff" path="res://step_tracker_background.jpg" id="2_l0yun"]
+[ext_resource type="Script" uid="uid://rv8ejrjo7sy5" path="res://label.gd" id="3_x7gh0"]
+
+[node name="Node2D" type="Node2D"]
+script = ExtResource("1_5cjam")
+
+[node name="Label1" type="Label" parent="."]
+offset_left = 1182.0
+offset_top = 943.0
+offset_right = 2286.0
+offset_bottom = 1401.0
+
+[node name="TextureRect" type="TextureRect" parent="."]
+offset_left = -349.0
+offset_top = -1041.0
+offset_right = 442.0
+offset_bottom = 987.0
+texture = ExtResource("2_l0yun")
+
+[node name="Label" type="Label" parent="."]
+z_index = 10
+offset_left = 99.0
+offset_top = 242.0
+offset_right = 388.0
+offset_bottom = 507.0
+theme_override_font_sizes/font_size = 10
+script = ExtResource("3_x7gh0")
